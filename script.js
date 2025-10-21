@@ -57,24 +57,44 @@ document.addEventListener("click", function (e) {
     }
 });
 
-// Function to handle form submission
-function submitForm() {
-    // Get form elements
+// Initialize EmailJS
+(function() {
+    emailjs.init("wKVTxruCmaIFdqXpa");
+})();
+
+// Handle form submission
+document.getElementById("contactForm").addEventListener("submit", function(event) {
+    event.preventDefault(); // Prevent default form submission
+
+    // Get form values
     const name = document.getElementById("name").value;
     const email = document.getElementById("email").value;
     const message = document.getElementById("message").value;
 
-    // Validation to ensure all fields are filled
+    // Validation
     if (name && email && message) {
-        // Display personalized success message with user's name
+        // Show sending message
         document.getElementById("responseMessage").style.display = "block";
-        document.getElementById("responseMessage").textContent = "Thanks for reaching out, " + name + "!";
+        document.getElementById("responseMessage").textContent = "Sending your message, " + name + "...";
 
-        // Clear the form after submission
-        document.getElementById("contactForm").reset();
+        // Send email using EmailJS
+        emailjs.send("service_qucf25s", "template_29n64vc", {
+            from_name: name,
+            from_email: email,
+            message: message
+        })
+        .then(function(response) {
+            // Success!
+            document.getElementById("responseMessage").textContent = "Thanks for reaching out, " + name + "! I'll get back to you soon.";
+            document.getElementById("contactForm").reset();
+        }, function(error) {
+            // Error
+            document.getElementById("responseMessage").textContent = "Oops! Something went wrong. Please try again.";
+            console.log("EmailJS error:", error);
+        });
     } else {
-        // Display error message if any field is empty
+        // Validation error
         document.getElementById("responseMessage").style.display = "block";
         document.getElementById("responseMessage").textContent = "Please fill in all fields.";
     }
-}
+});
